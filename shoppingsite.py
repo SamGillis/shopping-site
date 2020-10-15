@@ -89,10 +89,7 @@ def show_shopping_cart():
         setattr(cart_melon, "total_cost",
                 (cart_melon.price * cart_contents[key]))
         melon_objects.append(cart_melon)
-    
-    print("\n \n\n\n*****************")
-    print(melon_objects)
-
+        
 
     return render_template("cart.html",
                         melon_objects=melon_objects, cart_total_cost=cart_total_cost)
@@ -123,7 +120,7 @@ def add_to_cart(melon_id):
 
     flash('Melon successfully added to cart!')
 
-    return render_template("cart.html")
+    return redirect("/cart")
 
 
 @app.route("/login", methods=["GET"])
