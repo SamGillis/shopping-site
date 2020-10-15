@@ -6,7 +6,7 @@ put melons in a shopping cart.
 Authors: Joel Burton, Christian Fernandez, Meggie Mahnken, Katie Byers.
 """
 
-from flask import Flask, render_template, redirect, flash
+from flask import Flask, render_template, redirect, flash, session
 import jinja2
 
 import melons
@@ -78,7 +78,24 @@ def show_shopping_cart():
     # Make sure your function can also handle the case wherein no cart has
     # been added to the session
 
-    return render_template("cart.html")
+    cart_contents = session['cart']
+    melon_objects = []
+    cart_total_cost = 0
+
+    for key in cart_contents:
+        cart_melon = melons.get_by_id(key)
+        cart_total_cost += (cart_melon.price * cart_contents[key])
+        setattr(cart_melon, "quantity", cart_contents[key])
+        setattr(cart_melon, "total_cost",
+                (cart_melon.price * cart_contents[key]))
+        melon_objects.append(cart_melon)
+    
+    print("\n \n\n\n*****************")
+    print(melon_objects)
+
+
+    return render_template("cart.html",
+                        melon_objects=melon_objects, cart_total_cost=cart_total_cost)
 
 
 @app.route("/add_to_cart/<melon_id>")
@@ -89,7 +106,7 @@ def add_to_cart(melon_id):
     page and display a confirmation message: 'Melon successfully added to
     cart'."""
 
-    # TODO: Finish shopping cart functionality
+    # Finish shopping cart functionality
 
     # The logic here should be something like:
     #
@@ -100,7 +117,13 @@ def add_to_cart(melon_id):
     # - flash a success message
     # - redirect the user to the cart page
 
-    return "Oops! This needs to be implemented!"
+    session['cart'] = session.get('cart', {})
+
+    session['cart'][melon_id] = session['cart'].get(melon_id, 0) + 1
+
+    flash('Melon successfully added to cart!')
+
+    return render_template("cart.html")
 
 
 @app.route("/login", methods=["GET"])
@@ -118,7 +141,7 @@ def process_login():
     dictionary, look up the user, and store them in the session.
     """
 
-    # TODO: Need to implement this!
+    # TODO Need to implement this!
 
     # The logic here should be something like:
     #
@@ -144,6 +167,16 @@ def checkout():
 
     flash("Sorry! Checkout will be implemented in a future version.")
     return redirect("/melons")
+
+
+# @app.route('/session')
+# def set_session():
+
+#     session['cart'] = {'watermelon': 1}
+
+#     fav_num = session['cart']['watermelon']
+
+#     return f"""<html><p>{fav_num}</p></html>"""
 
 
 if __name__ == "__main__":
